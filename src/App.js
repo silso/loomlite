@@ -1,4 +1,5 @@
 import React from 'react';
+import Table from './Table.js';
 import './styles/styles.scss';
 
 /**
@@ -13,15 +14,7 @@ class App extends React.Component {
   }
 
   render() {
-    return (
-      <button
-        onClick={() => {
-          this.setState({ count: this.state.count + 1 });
-        }}
-      >
-        Count: {this.state.count}
-      </button>
-    );
+		return <Table/>
   }
 }
 export default App;

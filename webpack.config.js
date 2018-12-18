@@ -8,6 +8,11 @@ module.exports = {
     path: path.join(__dirname, "www"),
     filename: "bundle.js"
   },
+	devServer: {
+		open: true,
+		stats: 'errors-only',
+		openPage: '/www'
+	},
   module: {
     rules: [
       {

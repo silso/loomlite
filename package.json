@@ -1,25 +1,27 @@
 {
-  "name": "minimal-react-starter",
+  "name": "loomlite",
   "version": "0.1.0",
-  "description": "Minimal react starter project",
-  "main": "src/index.js",
+  "description": "Loom pattern creation app",
+  "main": "server.js",
   "scripts": {
     "compile": "webpack",
     "build": "webpack -p",
-    "start": "node server.js"
+    "start": "webpack-dev-server --mode development"
   },
   "keywords": [
+    "loom",
+    "pixeloom",
     "react",
     "webpack",
     "babel",
     "minimal",
     "starter"
   ],
-  "author": "Andrew H Farmer",
-  "license": "MIT",
+  "author": "Chris Roelofs",
+  "license": "",
   "repository": {
     "type": "git",
-    "url": "git://github.com/ahfarmer/minimal-react-starter.git"
+    "url": "git://github.com/silso/loomlite.git"
   },
   "dependencies": {
     "babel-core": "^6.26.3",
@@ -36,6 +38,8 @@
     "css-loader": "^2.0.1",
     "node-sass": "^4.11.0",
     "sass-loader": "^7.1.0",
-    "style-loader": "^0.23.1"
+    "style-loader": "^0.23.1",
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-server": "^3.1.10"
   }
 }

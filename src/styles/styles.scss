@@ -1,9 +1,20 @@
 body {
-	background-color: #dddddd;
+	margin: 0px;
+	background-color: #eeeeee;
 }
 
-.cell {
-	background-color: red;
-	height: 20px;
-	width: 5px;
+.topTable {
+	direction: rtl;
+	overflow: scroll;
+	align: right;
+	margin-right: 0px;
+	margin-left: auto;
+	height: 100%;
+}
+
+.patCell {
+	width: 15px;
+	min-width: 15px;
+	height: 15px;
+	border: 1px solid rgba(0, 0, 0, 0.2);
 }

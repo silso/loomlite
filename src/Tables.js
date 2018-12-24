@@ -3,6 +3,7 @@ import React from 'react';
 /**
  * PatCell
  */
+/*
 class PatCell extends React.Component {
 	constructor(props) {
 		super(props);
@@ -19,10 +20,12 @@ class PatCell extends React.Component {
 		)
 	}
 }
+*/
 
 /**
  * PatTable
  */
+/*
 class PatTable extends React.Component {
 	constructor(props) {
 		super(props);
@@ -57,3 +60,20 @@ class PatTable extends React.Component {
 }
 
 export default PatTable;
+*/
+
+export class Tieup extends React.Component {
+	
+}
+
+export class Threading extends React.Component {
+	
+}
+
+export class Treadling extends React.Component {
+	
+}
+
+export class Drawdown extends React.Component {
+
+}

@@ -1,6 +1,6 @@
-import React from 'react';
-import PatTable from './PatTable.js';
-import './styles/styles.scss';
+import React from "react";
+import Draft from "./Draft.js";
+import "./styles/styles.scss";
 
 /**
  * App
@@ -41,18 +41,7 @@ class App extends React.Component {
 
   render() {
 		return (
-			<div className="topTable">
-				<table cellPadding="5"><tbody>
-					<tr>
-						<td><PatTable numX="6" numY="4"/></td>
-						<td><PatTable numX="50" numY="4"/></td>
-					</tr>
-					<tr>
-						<td><PatTable numX="6" numY="50"/></td>
-						<td><PatTable numX="50" numY="50"/></td>
-					</tr>
-				</tbody></table>
-			</div>
+			<Draft/>
 		);
   }
 }

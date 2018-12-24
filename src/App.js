@@ -30,19 +30,19 @@ class App extends React.Component {
 	}
 
 	componentDidMount() {
-		document.body.addEventListener('mousedown', this.handleClick);
-		document.body.addEventListener('mouseup', this.handleUnclick);
+		//document.body.addEventListener('mousedown', this.handleClick);
+		//document.body.addEventListener('mouseup', this.handleUnclick);
 	}
 
 	componentWillUnmount() {
-		document.body.removeEventListener('mousedown', this.handleClick);
-		document.body.removeEventListener('mouseup', this.handleUnclick);
+		//document.body.removeEventListener('mousedown', this.handleClick);
+		//document.body.removeEventListener('mouseup', this.handleUnclick);
 	}
 
   render() {
 		return (
 			<div className="topTable">
-				<table><tbody>
+				<table cellPadding="5"><tbody>
 					<tr>
 						<td><PatTable numX="6" numY="4"/></td>
 						<td><PatTable numX="50" numY="4"/></td>

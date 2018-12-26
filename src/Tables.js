@@ -1,32 +1,77 @@
 import React from 'react';
 
 /**
- * PatCell
+ * DraftCell
  */
-/*
-class PatCell extends React.Component {
+class DraftCell extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = {};
+		this.state = {
+			clicked: false
+		}
 	}
 
 	handleClick() {
-		this.setState({color: this.props.color});
+		console.log("i was clicked");
+		this.setState({clicked: !this.state.clicked});
+		this.props.onClick();
 	}
 
 	render() {
 		return (
-			<td className={this.props.className} onClick={() => this.handleClick()} style={{backgroundColor: this.state.color}}></td>
+			<td className={this.props.className} onClick={() => this.handleClick()} style={{backgroundColor: this.state.clicked && this.props.color}}></td>
 		)
 	}
 }
-*/
 
 /**
- * PatTable
+ * DraftTable
  */
-/*
-class PatTable extends React.Component {
+class DraftTable extends React.Component {
+	constructor(props) {
+		super(props);
+	}
+
+	handleClick(i, j) {
+		return () => {
+			console.log(`hello: ${i}, ${j}`);
+			this.props.onClick(i, j);
+		}
+	}
+
+	render() {
+		let table = new Array(this.props.numY);
+		for (let i = 0; i < this.props.numY; i++) {
+			let row = new Array(this.props.numX);
+			for (let j = 0; j < this.props.numX; j++) {
+				row[j] = <DraftCell key={`${i},${j}`} className="patCell" onClick={this.handleClick(i, j)} color="black" />;
+			}
+			table[i] = <tr key={`${i}`}>{row}</tr>;
+		}
+		return (
+			<table cellPadding="0" cellSpacing="0"><tbody>{table}</tbody></table>
+		);
+	}
+}
+
+export class Coloring extends DraftTable {
+
+}
+
+export class Tieup extends DraftTable {
+	
+}
+
+export class Threading extends DraftTable {
+	
+}
+
+export class Treadling extends DraftTable {
+	
+}
+
+export class Drawdown extends DraftTable {
+	/*
 	constructor(props) {
 		super(props);
 		let colors = [];
@@ -40,7 +85,7 @@ class PatTable extends React.Component {
 			}
 		}
 		this.state = {
-			colors: colors
+			colors: colors,
 		}
 	}
 
@@ -49,7 +94,7 @@ class PatTable extends React.Component {
 		for (let i = 0; i < this.props.numY; i++) {
 			let row = new Array(this.props.numX);
 			for (let j = 0; j < this.props.numX; j++) {
-				row[j] = <PatCell key={`${i},${j}`} className="patCell" color={`rgb(${this.state.colors[i][j][0]},${this.state.colors[i][j][1]},${this.state.colors[i][j][2]})`} />;
+				row[j] = <DraftCell key={`${i},${j}`} className="patCell" onClick={this.handleClick(i, j)} color={`rgb(${this.state.colors[i][j][0]},${this.state.colors[i][j][1]},${this.state.colors[i][j][2]})`} />;
 			}
 			table[i] = <tr key={`${i}`}>{row}</tr>;
 		}
@@ -57,23 +102,5 @@ class PatTable extends React.Component {
 			<table cellPadding="0" cellSpacing="0"><tbody>{table}</tbody></table>
 		);
 	}
-}
-
-export default PatTable;
-*/
-
-export class Tieup extends React.Component {
-	
-}
-
-export class Threading extends React.Component {
-	
-}
-
-export class Treadling extends React.Component {
-	
-}
-
-export class Drawdown extends React.Component {
-
+	*/
 }

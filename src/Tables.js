@@ -2,7 +2,9 @@ import React from "react";
 import {updateArray} from "./LoomLib.js";
 
 /**
- * DraftCell
+ * DraftCell - base component of all Draft components. This is displayed as one
+ * square cell on screen
+ * @extends React.Component
  */
 class DraftCell extends React.Component {
 	constructor(props) {
@@ -17,7 +19,6 @@ class DraftCell extends React.Component {
 
 	handleMouseDown() {
 		this.props.onMouseDown(this.props.yCoord, this.props.xCoord);
-		//this.handleClick();
 	}
 
 	handleMouseEnter() {
@@ -26,30 +27,35 @@ class DraftCell extends React.Component {
 		}
 	}
 
-	handleClick() {
+	handleClick() { //currently does not run on normal clicks, only on drags
 		this.props.onClick(this.props.yCoord, this.props.xCoord);
 	}
 
 	render() {
 		return (
-			<td className={this.props.className} onMouseDown={this.handleMouseDown} onMouseEnter={this.handleMouseEnter} style={{backgroundColor:  (this.props.type === 0 && this.props.on) && this.props.color}}>{(this.props.type === 1 && this.props.on) && this.props.yCoord}</td>
+			<td
+				className={this.props.className}
+				onMouseDown={this.handleMouseDown}
+				onMouseEnter={this.handleMouseEnter}
+				style={{backgroundColor: (this.props.type === 0 && this.props.on) && this.props.color}}
+			>{(this.props.type === 1 && this.props.on) && this.props.yCoord}</td>
 		)
 	}
 }
 
 /**
- * DraftTable
+ * DraftTable - general form of a table of DraftCells
+ * @extends React.Component
  */
 class DraftTable extends React.Component {
 	constructor(props) {
 		super(props);
-		this.handleClick = this.handleClick.bind(this);
 		this.state = {
 			mouseDown: false
 		}
-		this.handleClick = this.handleClick.bind(this);
 		this.handleMouseDown = this.handleMouseDown.bind(this);
 		this.handleMouseUp = this.handleMouseUp.bind(this);
+		this.handleClick = this.handleClick.bind(this);
 		this.handleMouseLeave = this.handleMouseLeave.bind(this);
 	}
 
@@ -77,24 +83,48 @@ class DraftTable extends React.Component {
 		for (let i = 0; i < this.props.numY; i++) {
 			let row = new Array(this.props.numX);
 			for (let j = 0; j < this.props.numX; j++) {
-				row[j] = <DraftCell key={`${i},${j}`} yCoord={i} xCoord={j} onMouseDown={this.handleMouseDown} className="draftCell" onClick={this.handleClick} type={0} color="black" />;
+				row[j] = <DraftCell
+					key={`${i},${j}`}
+					yCoord={i}
+					xCoord={j}
+					onMouseDown={this.handleMouseDown}
+					onClick={this.handleClick}
+					className="draftCell"
+					type={0}
+					color="black"
+				/>;
 			}
 			table[i] = <tr key={`${i}`}>{row}</tr>;
 		}
 		return (
-			<table cellPadding="0" cellSpacing="0"><tbody>{table}</tbody></table>
+			<table
+				cellPadding="0"
+				cellSpacing="0"
+			><tbody>{table}</tbody></table>
 		);
 	}
 }
 
+/**
+ * Coloring - top left and bottom right tables
+ * @extends DraftTable
+ */
 export class Coloring extends DraftTable {
 
 }
 
+/**
+ * Tieup - middle center table
+ * @extends DraftTable
+ */
 export class Tieup extends DraftTable {
 
 }
 
+/**
+ * Threading - middle left table
+ * @extends DraftTable
+ */
 export class Threading extends DraftTable {
 	constructor(props) {
 		super(props);
@@ -116,16 +146,36 @@ export class Threading extends DraftTable {
 		for (let i = 0; i < this.props.numY; i++) {
 			let row = new Array(this.props.numX);
 			for (let j = 0; j < this.props.numX; j++) {
-				row[j] = <DraftCell key={`${i},${j}`} yCoord={i} xCoord={j} mouseDown={this.state.mouseDown} onMouseDown={this.handleMouseDown} on={this.state.shaftNums[j] === i} className="draftCell" onClick={this.handleClick} type={1} color="black" />;
+				row[j] = <DraftCell
+					key={`${i},${j}`}
+					yCoord={i}
+					xCoord={j}
+					onMouseDown={this.handleMouseDown}
+					onClick={this.handleClick}
+					mouseDown={this.state.mouseDown}
+					on={this.state.shaftNums[j] === i}
+					className="draftCell"
+					type={1}
+					color="black"
+				/>;
 			}
 			table[this.props.numY - i - 1] = <tr key={`${i}`}>{row}</tr>;
 		}
 		return (
-			<table cellPadding="0" cellSpacing="0" onMouseDown={this.handleMouseDown} onMouseUp={this.handleMouseUp} onMouseLeave={this.handleMouseLeave}><tbody>{table}</tbody></table>
+			<table
+				cellPadding="0"
+				cellSpacing="0"
+				onMouseUp={this.handleMouseUp}
+				onMouseLeave={this.handleMouseLeave}
+			><tbody>{table}</tbody></table>
 		);
 	}
 }
 
+/**
+ * Treadling - table describing something. bottom center table
+ * @extends DraftTable
+ */
 export class Treadling extends DraftTable {
 	constructor(props) {
 		super(props);
@@ -137,8 +187,8 @@ export class Treadling extends DraftTable {
 	}
 
 	handleMouseDown(i, j) {
-		this.setState({mouseDown: true});
 		this.setState(state => {
+			state.mouseDown = true;
 			state.mouseDownOnBlack = state.treadles[i][j];
 		}, () => {
 			this.handleClick(i, j);
@@ -166,16 +216,36 @@ export class Treadling extends DraftTable {
 		for (let i = 0; i < this.props.numY; i++) {
 			let row = new Array(this.props.numX);
 			for (let j = 0; j < this.props.numX; j++) {
-				row[j] = <DraftCell key={`${i},${j}`} yCoord={i} xCoord={j} mouseDown={this.state.mouseDown} onMouseDown={this.handleMouseDown} on={this.state.treadles[i][j]} className="draftCell" onClick={this.handleClick} type={0} color="black" />;
+				row[j] = <DraftCell
+					key={`${i},${j}`}
+					yCoord={i}
+					xCoord={j}
+					onMouseDown={this.handleMouseDown}
+					onClick={this.handleClick}
+					mouseDown={this.state.mouseDown}
+					on={this.state.treadles[i][j]}
+					className="draftCell"
+					type={0}
+					color="black"
+				/>;
 			}
 			table[i] = <tr key={`${i}`}>{row}</tr>;
 		}
 		return (
-			<table cellPadding="0" cellSpacing="0" onMouseUp={this.handleMouseUp} onMouseLeave={this.handleMouseLeave}><tbody>{table}</tbody></table>
+			<table
+				cellPadding="0"
+				cellSpacing="0"
+				onMouseUp={this.handleMouseUp}
+				onMouseLeave={this.handleMouseLeave}
+			><tbody>{table}</tbody></table>
 		);
 	}
 }
 
+/**
+ * Drawdown - shows the pattern. bottom left table
+ * @extends DraftTable
+ */
 export class Drawdown extends DraftTable {
 	/*
 	constructor(props) {

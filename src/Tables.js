@@ -1,5 +1,16 @@
 import React from 'react';
 
+function updateArray(a, i, fn) {
+	return a.map((item, j) => {
+		if (j === i) {
+			return fn(item);
+		}
+		else {
+			return item;
+		}
+	});
+}
+
 /**
  * DraftCell
  */
@@ -9,17 +20,23 @@ class DraftCell extends React.Component {
 		this.state = {
 			clicked: false
 		}
+		this.handleMouseOver = this.handleMouseOver.bind(this);
+		this.handleClick = this.handleClick.bind(this);
+	}
+
+	handleMouseOver() {
+		if (this.props.mouseDown) {
+			this.handleClick();
+		}
 	}
 
 	handleClick() {
-		console.log("i was clicked");
-		this.setState({clicked: !this.state.clicked});
-		this.props.onClick();
+		this.props.onClick(this.props.xCoord, this.props.yCoord);
 	}
 
 	render() {
 		return (
-			<td className={this.props.className} onClick={() => this.handleClick()} style={{backgroundColor: this.state.clicked && this.props.color}}></td>
+			<td className={this.props.className} onMouseDown={this.handleClick} onMouseOver={this.handleMouseOver} style={{backgroundColor: this.props.on && this.props.color}}></td>
 		)
 	}
 }
@@ -30,11 +47,12 @@ class DraftCell extends React.Component {
 class DraftTable extends React.Component {
 	constructor(props) {
 		super(props);
+		this.handleClick = this.handleClick.bind(this);
 	}
 
 	handleClick(i, j) {
-		return () => {
-			console.log(`hello: ${i}, ${j}`);
+		console.log(`hello: ${i}, ${j}`);
+		if (this.props.onClick) {
 			this.props.onClick(i, j);
 		}
 	}
@@ -44,7 +62,7 @@ class DraftTable extends React.Component {
 		for (let i = 0; i < this.props.numY; i++) {
 			let row = new Array(this.props.numX);
 			for (let j = 0; j < this.props.numX; j++) {
-				row[j] = <DraftCell key={`${i},${j}`} className="patCell" onClick={this.handleClick(i, j)} color="black" />;
+				row[j] = <DraftCell key={`${i},${j}`} yCoord={i} xCoord={j} className="patCell" onClick={this.handleClick} color="black" />;
 			}
 			table[i] = <tr key={`${i}`}>{row}</tr>;
 		}
@@ -63,7 +81,54 @@ export class Tieup extends DraftTable {
 }
 
 export class Threading extends DraftTable {
+	constructor(props) {
+		super(props);
+		this.state = {
+			shaftNums: new Array(this.props.numX).fill(0),
+			mouseDown: false
+		}
+		this.handleMouseDown = this.handleMouseDown.bind(this);
+		this.handleMouseUp = this.handleMouseUp.bind(this);
+		this.handleMouseLeave = this.handleMouseLeave.bind(this);
+	}
+		
+	handleMouseDown() {
+		console.log('down')
+		this.setState({mouseDown: true});
+	}
+	handleMouseUp() {
+		console.log('up')
+		this.setState({mouseDown: false});
+	}
 	
+	handleClick(i, j) {
+		console.log('click')
+		this.setState(state => {
+			const newShaftNums = updateArray(state.shaftNums, i, a => j);
+			return {shaftNums: newShaftNums};
+		});
+	}
+	
+	handleMouseLeave() {
+		console.log('out')
+		this.setState({mouseDown: false});
+	}
+	
+	render() {
+		let table = new Array(this.props.numY);
+		for (let i = 0; i < this.props.numY; i++) {
+			let row = new Array(this.props.numX);
+			for (let j = 0; j < this.props.numX; j++) {
+				row[j] = <DraftCell key={`${i},${j}`} yCoord={i} xCoord={j} mouseDown={this.state.mouseDown} on={this.state.shaftNums[j] === i} className="patCell" onClick={this.handleClick} color="black" />;
+			}
+			table[this.props.numY - i - 1] = <tr key={`${i}`}>{row}</tr>;
+		}
+		return (
+			<div onMouseLeave={this.handleMouseLeave}>
+				<table cellPadding="0" cellSpacing="0" onMouseDown={this.handleMouseDown} onMouseUp={this.handleMouseUp}><tbody>{table}</tbody></table>
+			</div>
+		);
+	}
 }
 
 export class Treadling extends DraftTable {

@@ -10,23 +10,29 @@ class DraftCell extends React.Component {
 		this.state = {
 			clicked: false
 		}
-		this.handleMouseOver = this.handleMouseOver.bind(this);
+		this.handleMouseEnter = this.handleMouseEnter.bind(this);
 		this.handleClick = this.handleClick.bind(this);
+		this.handleMouseDown = this.handleMouseDown.bind(this);
 	}
 
-	handleMouseOver() {
+	handleMouseDown() {
+		this.props.onMouseDown(this.props.yCoord, this.props.xCoord);
+		//this.handleClick();
+	}
+
+	handleMouseEnter() {
 		if (this.props.mouseDown) {
 			this.handleClick();
 		}
 	}
 
 	handleClick() {
-		this.props.onClick(this.props.xCoord, this.props.yCoord);
+		this.props.onClick(this.props.yCoord, this.props.xCoord);
 	}
 
 	render() {
 		return (
-			<td className={this.props.className} onMouseDown={this.handleClick} onMouseOver={this.handleMouseOver}>{this.props.on && this.props.yCoord}</td>
+			<td className={this.props.className} onMouseDown={this.handleMouseDown} onMouseEnter={this.handleMouseEnter} style={{backgroundColor:  (this.props.type === 0 && this.props.on) && this.props.color}}>{(this.props.type === 1 && this.props.on) && this.props.yCoord}</td>
 		)
 	}
 }
@@ -38,6 +44,21 @@ class DraftTable extends React.Component {
 	constructor(props) {
 		super(props);
 		this.handleClick = this.handleClick.bind(this);
+		this.state = {
+			mouseDown: false
+		}
+		this.handleClick = this.handleClick.bind(this);
+		this.handleMouseDown = this.handleMouseDown.bind(this);
+		this.handleMouseUp = this.handleMouseUp.bind(this);
+		this.handleMouseLeave = this.handleMouseLeave.bind(this);
+	}
+
+	handleMouseDown(i, j) {
+		this.setState({mouseDown: true});
+		this.handleClick(i, j);
+	}
+	handleMouseUp() {
+		this.setState({mouseDown: false});
 	}
 
 	handleClick(i, j) {
@@ -47,12 +68,16 @@ class DraftTable extends React.Component {
 		}
 	}
 
+	handleMouseLeave() {
+		this.setState({mouseDown: false});
+	}
+
 	render() {
 		let table = new Array(this.props.numY);
 		for (let i = 0; i < this.props.numY; i++) {
 			let row = new Array(this.props.numX);
 			for (let j = 0; j < this.props.numX; j++) {
-				row[j] = <DraftCell key={`${i},${j}`} yCoord={i} xCoord={j} className="draftCell" onClick={this.handleClick} color="black" />;
+				row[j] = <DraftCell key={`${i},${j}`} yCoord={i} xCoord={j} onMouseDown={this.handleMouseDown} className="draftCell" onClick={this.handleClick} type={0} color="black" />;
 			}
 			table[i] = <tr key={`${i}`}>{row}</tr>;
 		}
@@ -67,7 +92,7 @@ export class Coloring extends DraftTable {
 }
 
 export class Tieup extends DraftTable {
-	
+
 }
 
 export class Threading extends DraftTable {
@@ -77,35 +102,21 @@ export class Threading extends DraftTable {
 			shaftNums: new Array(this.props.numX).fill(0),
 			mouseDown: false
 		}
-		this.handleMouseDown = this.handleMouseDown.bind(this);
-		this.handleMouseUp = this.handleMouseUp.bind(this);
-		this.handleMouseLeave = this.handleMouseLeave.bind(this);
 	}
-		
-	handleMouseDown() {
-		this.setState({mouseDown: true});
-	}
-	handleMouseUp() {
-		this.setState({mouseDown: false});
-	}
-	
+
 	handleClick(i, j) {
 		this.setState(state => {
-			const newShaftNums = updateArray(state.shaftNums, i, a => j);
+			const newShaftNums = updateArray(state.shaftNums, j, a => i);
 			return {shaftNums: newShaftNums};
 		});
 	}
-	
-	handleMouseLeave() {
-		this.setState({mouseDown: false});
-	}
-	
+
 	render() {
 		let table = new Array(this.props.numY);
 		for (let i = 0; i < this.props.numY; i++) {
 			let row = new Array(this.props.numX);
 			for (let j = 0; j < this.props.numX; j++) {
-				row[j] = <DraftCell key={`${i},${j}`} yCoord={i} xCoord={j} mouseDown={this.state.mouseDown} on={this.state.shaftNums[j] === i} className="draftCell" onClick={this.handleClick} color="black" />;
+				row[j] = <DraftCell key={`${i},${j}`} yCoord={i} xCoord={j} mouseDown={this.state.mouseDown} onMouseDown={this.handleMouseDown} on={this.state.shaftNums[j] === i} className="draftCell" onClick={this.handleClick} type={1} color="black" />;
 			}
 			table[this.props.numY - i - 1] = <tr key={`${i}`}>{row}</tr>;
 		}
@@ -116,7 +127,53 @@ export class Threading extends DraftTable {
 }
 
 export class Treadling extends DraftTable {
-	
+	constructor(props) {
+		super(props);
+		this.state = {
+			treadles: new Array(this.props.numY).fill(new Array(this.props.numX).fill(false)),
+			mouseDown: false,
+			mouseDownOnBlack: false
+		}
+	}
+
+	handleMouseDown(i, j) {
+		this.setState({mouseDown: true});
+		this.setState(state => {
+			state.mouseDownOnBlack = state.treadles[i][j];
+		}, () => {
+			this.handleClick(i, j);
+		});
+	}
+
+	handleClick(i, j) {
+		this.setState(state => {
+			let newTreadles = [];
+			for (let k = 0; k < state.treadles.length; k++) {
+				newTreadles[k] = state.treadles[k].slice();
+			}
+			if (this.state.mouseDownOnBlack) {
+				newTreadles[i][j] = false;
+			}
+			else {
+				newTreadles[i][j] = true;
+			}
+			return {treadles: newTreadles};
+		});
+	}
+
+	render() {
+		let table = new Array(this.props.numY);
+		for (let i = 0; i < this.props.numY; i++) {
+			let row = new Array(this.props.numX);
+			for (let j = 0; j < this.props.numX; j++) {
+				row[j] = <DraftCell key={`${i},${j}`} yCoord={i} xCoord={j} mouseDown={this.state.mouseDown} onMouseDown={this.handleMouseDown} on={this.state.treadles[i][j]} className="draftCell" onClick={this.handleClick} type={0} color="black" />;
+			}
+			table[i] = <tr key={`${i}`}>{row}</tr>;
+		}
+		return (
+			<table cellPadding="0" cellSpacing="0" onMouseUp={this.handleMouseUp} onMouseLeave={this.handleMouseLeave}><tbody>{table}</tbody></table>
+		);
+	}
 }
 
 export class Drawdown extends DraftTable {

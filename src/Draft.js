@@ -1,6 +1,6 @@
 import React from "react";
 import {Coloring, Tieup, Threading, Treadling, Drawdown} from "./Tables.js";
-import {updateArray} from "./LoomLib.js";
+import {updateArray, disableSelection} from "./LoomLib.js";
 
 const initShafts = 4, initTreadles = 6, initWarp = 50, initWeft = 50;
 
@@ -34,9 +34,13 @@ export default class Draft extends React.PureComponent {
 		});
 	}
 
+	componentDidMount() {
+		disableSelection(document.getElementById("draftTable"));
+	}
+
 	render() {
 		return (
-			<div className="topTable">
+			<div id="draftTable">
 				<table cellPadding="5"><tbody>
 					<tr>
 						<td></td>

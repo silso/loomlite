@@ -36,7 +36,7 @@ class DraftCell extends React.Component {
 
 	render() {
 		return (
-			<td className={this.props.className} onMouseDown={this.handleClick} onMouseOver={this.handleMouseOver} style={{backgroundColor: this.props.on && this.props.color}}></td>
+			<td className={this.props.className} onMouseDown={this.handleClick} onMouseOver={this.handleMouseOver}>{this.props.on && this.props.yCoord}</td>
 		)
 	}
 }
@@ -62,7 +62,7 @@ class DraftTable extends React.Component {
 		for (let i = 0; i < this.props.numY; i++) {
 			let row = new Array(this.props.numX);
 			for (let j = 0; j < this.props.numX; j++) {
-				row[j] = <DraftCell key={`${i},${j}`} yCoord={i} xCoord={j} className="patCell" onClick={this.handleClick} color="black" />;
+				row[j] = <DraftCell key={`${i},${j}`} yCoord={i} xCoord={j} className="draftCell" onClick={this.handleClick} color="black" />;
 			}
 			table[i] = <tr key={`${i}`}>{row}</tr>;
 		}
@@ -119,7 +119,7 @@ export class Threading extends DraftTable {
 		for (let i = 0; i < this.props.numY; i++) {
 			let row = new Array(this.props.numX);
 			for (let j = 0; j < this.props.numX; j++) {
-				row[j] = <DraftCell key={`${i},${j}`} yCoord={i} xCoord={j} mouseDown={this.state.mouseDown} on={this.state.shaftNums[j] === i} className="patCell" onClick={this.handleClick} color="black" />;
+				row[j] = <DraftCell key={`${i},${j}`} yCoord={i} xCoord={j} mouseDown={this.state.mouseDown} on={this.state.shaftNums[j] === i} className="draftCell" onClick={this.handleClick} color="black" />;
 			}
 			table[this.props.numY - i - 1] = <tr key={`${i}`}>{row}</tr>;
 		}

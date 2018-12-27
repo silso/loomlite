@@ -8,6 +8,10 @@ import React from "react"
  */
 
 export function updateArray(a, i, fn) {
+	const list = a.slice();
+	list[i] = fn(list[i]);
+	return list;
+	/*
 	return a.map((item, j) => {
 		if (j === i) {
 			return fn(item);
@@ -16,6 +20,7 @@ export function updateArray(a, i, fn) {
 			return item;
 		}
 	});
+	*/
 }
 /**
  * disableSelection

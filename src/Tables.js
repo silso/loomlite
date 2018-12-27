@@ -1,15 +1,5 @@
-import React from 'react';
-
-function updateArray(a, i, fn) {
-	return a.map((item, j) => {
-		if (j === i) {
-			return fn(item);
-		}
-		else {
-			return item;
-		}
-	});
-}
+import React from "react";
+import {updateArray} from "./LoomLib.js";
 
 /**
  * DraftCell
@@ -93,16 +83,13 @@ export class Threading extends DraftTable {
 	}
 		
 	handleMouseDown() {
-		console.log('down')
 		this.setState({mouseDown: true});
 	}
 	handleMouseUp() {
-		console.log('up')
 		this.setState({mouseDown: false});
 	}
 	
 	handleClick(i, j) {
-		console.log('click')
 		this.setState(state => {
 			const newShaftNums = updateArray(state.shaftNums, i, a => j);
 			return {shaftNums: newShaftNums};
@@ -110,7 +97,6 @@ export class Threading extends DraftTable {
 	}
 	
 	handleMouseLeave() {
-		console.log('out')
 		this.setState({mouseDown: false});
 	}
 	
@@ -124,9 +110,7 @@ export class Threading extends DraftTable {
 			table[this.props.numY - i - 1] = <tr key={`${i}`}>{row}</tr>;
 		}
 		return (
-			<div onMouseLeave={this.handleMouseLeave}>
-				<table cellPadding="0" cellSpacing="0" onMouseDown={this.handleMouseDown} onMouseUp={this.handleMouseUp}><tbody>{table}</tbody></table>
-			</div>
+			<table cellPadding="0" cellSpacing="0" onMouseDown={this.handleMouseDown} onMouseUp={this.handleMouseUp} onMouseLeave={this.handleMouseLeave}><tbody>{table}</tbody></table>
 		);
 	}
 }

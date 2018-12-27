@@ -1,25 +1,8 @@
-import React from "react"
-import {Coloring, Tieup, Threading, Treadling, Drawdown} from './Tables.js';
+import React from "react";
+import {Coloring, Tieup, Threading, Treadling, Drawdown} from "./Tables.js";
+import {updateArray} from "./LoomLib.js";
 
 const initShafts = 4, initTreadles = 6, initWarp = 50, initWeft = 50;
-
-/**
- * updateArray
- * @param a input array to be updated
- * @param i index of element in array a to be updated
- * @param fn function to be called on element a[i]
- */
-
-function updateArray(a, i, fn) {
-	return a.map((item, j) => {
-		if (j === i) {
-			return fn(item);
-		}
-		else {
-			return item;
-		}
-	});
-}
 
 export default class Draft extends React.PureComponent {
 	constructor(state) {

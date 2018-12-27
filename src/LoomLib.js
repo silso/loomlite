@@ -17,6 +17,7 @@ export function updateArray(a, i, fn) {
 		}
 	});
 }
+
 /**
  * disableSelection
  * source: http://www.dynamicdrive.com/dynamicindex9/noselect.htm

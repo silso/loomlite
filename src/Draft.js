@@ -12,7 +12,7 @@ export default class Draft extends React.PureComponent {
 			treadles: initTreadles,
 			warp: initWarp,
 			weft: initWeft,
-			cursorColor: 1,
+			cursorColor: "#000000",
 			warpColors: new Array(initWarp).fill(0),
 			weftColors: new Array(initWeft).fill(0),
 			tieup: new Array(initShafts).fill(new Array(initTreadles).fill(false)),
@@ -21,6 +21,7 @@ export default class Draft extends React.PureComponent {
 		}
 		this.handleClickWarpColor = this.handleClickWarpColor.bind(this);
 		this.handleClickWeftColor = this.handleClickWeftColor.bind(this);
+		this.handleColorChange = this.handleColorChange.bind(this);
 	}
 
 	componentDidMount() {
@@ -41,6 +42,10 @@ export default class Draft extends React.PureComponent {
 		});
 	}
 
+	handleColorChange(e) {
+		this.setState({cursorColor: e.target.value});
+	}
+
 	render() {
 		const shafts = this.state.shafts;
 		const treadles = this.state.treadles;
@@ -51,7 +56,7 @@ export default class Draft extends React.PureComponent {
 				<table cellPadding="5"><tbody>
 					<tr>
 						<td></td>
-						<td></td>
+						<td><form id="colorPicker" style={{backgroundColor: this.state.cursorColor}}><input type="color" onChange={this.handleColorChange}/></form></td>
 						<td><Coloring numX={warp} numY="1" onClick={this.handleClickWarpColor}/></td>
 					</tr>
 					<tr>

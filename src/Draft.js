@@ -24,7 +24,7 @@ export default class Draft extends React.PureComponent {
 	}
 
 	componentDidMount() {
-		disableSelection(document.getElementById("draftTable"));
+		disableSelection(document.getElementById("topTable"));
 	}
 
 	handleClickWarpColor(i, j) {
@@ -47,7 +47,7 @@ export default class Draft extends React.PureComponent {
 		const warp = this.state.warp;
 		const weft = this.state.weft;
 		return (
-			<div id="draftTable">
+			<div id="topTable">
 				<table cellPadding="5"><tbody>
 					<tr>
 						<td></td>

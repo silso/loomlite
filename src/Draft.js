@@ -2,9 +2,11 @@ import React from "react";
 import {Coloring, Tieup, Threading, Treadling, Drawdown} from "./Tables.js";
 import {updateArray, disableSelection} from "./LoomLib.js";
 
+import {connect} from "react-redux";
+
 const initShafts = 4, initTreadles = 6, initWarp = 50, initWeft = 50;
 
-export default class Draft extends React.PureComponent {
+class Draft extends React.PureComponent {
 	constructor(state) {
 		super(state);
 		this.state = {
@@ -47,6 +49,8 @@ export default class Draft extends React.PureComponent {
 	}
 
 	render() {
+		console.log(this.props);
+
 		const shafts = this.state.shafts;
 		const treadles = this.state.treadles;
 		const warp = this.state.warp;
@@ -82,3 +86,9 @@ export default class Draft extends React.PureComponent {
 		);
 	}
 }
+
+const mapStateToProps = state => {
+	return state;
+}
+
+export default connect(mapStateToProps)(Draft);

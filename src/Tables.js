@@ -61,6 +61,8 @@ class DraftTable extends React.Component {
 	constructor(props) {
 		super(props);
 		this.type = 0;
+		this.className = "draftTable";
+		this.flipVertically = false;
 		this.state = {
 			cellColors: [[]],
 			mouseDown: false,
@@ -97,6 +99,7 @@ class DraftTable extends React.Component {
 	}
 
 	handleClick(i, j) {
+//		console.log("clicked", i, j);
 		this.setState(state => {
 			let newCellColors = [];
 			for (let k = 0; k < state.cellColors.length; k++) {
@@ -124,11 +127,16 @@ class DraftTable extends React.Component {
 					type={this.type}
 				/>;
 			}
-			table[i] = <tr key={`${i}`}>{row}</tr>;
+			if (this.flipVertically) {
+				table[this.props.numY - 1 - i] = <tr key={`${i}`}>{row}</tr>;
+			}
+			else {
+				table[i] = <tr key={`${i}`}>{row}</tr>;
+			}
 		}
 		return (
 			<table
-				className="draftTable"
+				className={this.className}
 				cellPadding="0"
 				cellSpacing="0"
 				onMouseUp={this.handleMouseUp}
@@ -143,7 +151,10 @@ class DraftTable extends React.Component {
  * @extends DraftTable
  */
 export class Coloring extends DraftTable {
-
+	constructor(props) {
+		super(props);
+		this.className = "leftDraftTable";
+	}
 }
 
 /**
@@ -151,7 +162,10 @@ export class Coloring extends DraftTable {
  * @extends DraftTable
  */
 export class Tieup extends DraftTable {
-
+	constructor(props) {
+		super(props);
+		this.flipVertically = true;
+	}
 }
 
 /**
@@ -161,12 +175,15 @@ export class Tieup extends DraftTable {
 export class Threading extends DraftTable {
 	constructor(props) {
 		super(props);
+		//display your number instead of color
 		this.type = 1;
+		this.className = "leftDraftTable";
+		this.flipVertically = true;
 		this.state = {
 			shaftNums: [],
 			mouseDown: false
 		}
-		this.state.shaftNums = new Array(this.props.numX).fill(this.props.numY - 1);
+		this.state.shaftNums = new Array(this.props.numX).fill(0);
 	}
 
 	handleMouseDown(i, j) {
@@ -180,6 +197,7 @@ export class Threading extends DraftTable {
 	}
 
 	handleClick(i, j) {
+//		console.log("clicked", i, j);
 		this.setState(state => {
 			let newShaftNums = state.shaftNums.slice();
 
@@ -195,7 +213,7 @@ export class Threading extends DraftTable {
 			for (let j = 0; j < this.props.numX; j++) {
 				let display = "";
 				if (this.state.shaftNums[j] === i) {
-					display = this.props.numY - i;
+					display = i + 1;
 				}
 				row[j] = <DraftCell
 					key={`${i},${j}`}
@@ -208,11 +226,16 @@ export class Threading extends DraftTable {
 					type={this.type}
 				/>;
 			}
-			table[i] = <tr key={`${i}`}>{row}</tr>;
+			if (this.flipVertically) {
+				table[this.props.numY - 1 - i] = <tr key={`${i}`}>{row}</tr>;
+			}
+			else {
+				table[i] = <tr key={`${i}`}>{row}</tr>;
+			}
 		}
 		return (
 			<table
-				className="draftTable"
+				className={this.className}
 				cellPadding="0"
 				cellSpacing="0"
 				onMouseUp={this.handleMouseUp}
@@ -235,36 +258,8 @@ export class Treadling extends DraftTable {
  * @extends DraftTable
  */
 export class Drawdown extends DraftTable {
-	/*
 	constructor(props) {
 		super(props);
-		let colors = [];
-		for (let i = 0; i < this.props.numY; i++) {
-			colors[i] = [];
-			for (let j = 0; j < this.props.numX; j++) {
-				colors[i][j] = [];
-				for (let k = 0; k < 3; k++) {
-					colors[i][j][k] = Math.floor(Math.random() * 256);
-				}
-			}
-		}
-		this.state = {
-			colors: colors,
-		}
+		this.className = "leftDraftTable";
 	}
-
-	render() {
-		let table = new Array(this.props.numY);
-		for (let i = 0; i < this.props.numY; i++) {
-			let row = new Array(this.props.numX);
-			for (let j = 0; j < this.props.numX; j++) {
-				row[j] = <DraftCell key={`${i},${j}`} className="patCell" onClick={this.handleClick(i, j)} color={`rgb(${this.state.colors[i][j][0]},${this.state.colors[i][j][1]},${this.state.colors[i][j][2]})`} />;
-			}
-			table[i] = <tr key={`${i}`}>{row}</tr>;
-		}
-		return (
-			<table cellPadding="0" cellSpacing="0"><tbody>{table}</tbody></table>
-		);
-	}
-	*/
 }

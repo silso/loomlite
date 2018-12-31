@@ -63,6 +63,7 @@ class DraftTable extends React.Component {
 		this.type = 0;
 		this.className = "draftTable";
 		this.flipVertically = false;
+		this.useColors = false;
 		this.state = {
 			cellColors: [[]],
 			mouseDown: false,

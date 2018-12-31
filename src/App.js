@@ -15,8 +15,9 @@ const store = createStore(
 	allReducers,
 	{
 		cursorColor: 1,
-		colorKey: ["#ffffff, #000000"]
-	}
+		colorKey: ["#ffffff", "#000000"]
+	},
+	window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
 );
 
 /**

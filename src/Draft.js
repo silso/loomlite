@@ -3,6 +3,7 @@ import {Coloring, Tieup, Threading, Treadling, Drawdown} from "./Tables.js";
 import {updateArray, disableSelection} from "./LoomLib.js";
 
 import {connect} from "react-redux";
+import {updateCursorColor, updateColorKey} from "./actions.js";
 
 const initShafts = 4, initTreadles = 6, initWarp = 50, initWeft = 50;
 
@@ -14,7 +15,6 @@ class Draft extends React.PureComponent {
 			treadles: initTreadles,
 			warp: initWarp,
 			weft: initWeft,
-			cursorColor: "#000000",
 			warpColors: new Array(initWarp).fill(0),
 			weftColors: new Array(initWeft).fill(0),
 			tieup: new Array(initShafts).fill(new Array(initTreadles).fill(false)),
@@ -45,12 +45,18 @@ class Draft extends React.PureComponent {
 	}
 
 	handleColorChange(e) {
-		this.setState({cursorColor: e.target.value});
+		let newColor = e.target.value;
+		let i = this.props.colorKey.indexOf(newColor);
+		if (i > -1) {
+			this.props.onUpdateCursorColor(i);
+		}
+		else {
+			this.props.onUpdateCursorColor(this.props.colorKey.length);
+			this.props.onUpdateColorKey(newColor);
+		}
 	}
 
 	render() {
-		console.log(this.props);
-
 		const shafts = this.state.shafts;
 		const treadles = this.state.treadles;
 		const warp = this.state.warp;
@@ -60,7 +66,7 @@ class Draft extends React.PureComponent {
 				<table cellPadding="5"><tbody>
 					<tr>
 						<td></td>
-						<td><form id="colorPicker" style={{backgroundColor: this.state.cursorColor}}><input type="color" onChange={this.handleColorChange}/></form></td>
+						<td><form id="colorPicker" style={{backgroundColor: this.props.colorKey[this.props.cursorColor]}}><input type="color" onChange={this.handleColorChange}/></form></td>
 						<td><Coloring numX={warp} numY="1" onClick={this.handleClickWarpColor}/></td>
 					</tr>
 					<tr>
@@ -87,8 +93,14 @@ class Draft extends React.PureComponent {
 	}
 }
 
-const mapStateToProps = state => {
-	return state;
-}
+const mapStateToProps = state => ({
+	cursorColor: state.cursorColor,
+	colorKey: state.colorKey
+});
 
-export default connect(mapStateToProps)(Draft);
+const mapDispatchToProps = {
+	onUpdateCursorColor: updateCursorColor,
+	onUpdateColorKey: updateColorKey
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Draft);

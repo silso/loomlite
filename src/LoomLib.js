@@ -59,3 +59,18 @@ export function getColumnFromTable(a, i) {
 		return row[i];
 	});
 }
+
+/**
+ * quickHash() Fast insecure hash function used to detect changes in strings
+ * source: https://gist.github.com/iperelivskiy/4110988#gistcomment-2591235
+ *
+ * @param {string} s - input string
+ *
+ * @return {int}
+ */
+export function quickHash(s) {
+	let h = 1;
+	for (let i = 0; i < s.length; i++)
+		h = Math.imul(h + s.charCodeAt(i) | 0, 2654435761);
+	return (h^h >>> 17) >>> 0;
+}

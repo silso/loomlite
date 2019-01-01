@@ -1,26 +1,19 @@
 import React from "react";
 import {WarpColoring, WeftColoring, Tieup, Threading, Treadling, Drawdown} from "./Tables.js";
-import {updateArray, disableSelection, getColumnFromTable} from "./LoomLib.js";
+import {updateArray, disableSelection, getColumnFromTable, quickHash} from "./LoomLib.js";
 
-import {connect} from "react-redux";
-import {updateCursorColor, updateColorKey} from "./actions.js";
-
-const initShafts = 4, initTreadles = 6, initWarp = 50, initWeft = 50;
-
-class Draft extends React.PureComponent {
+class DraftChild extends React.PureComponent {
 	constructor(state) {
 		super(state);
 		this.state = {
-			shafts: initShafts,
-			treadles: initTreadles,
-			warp: initWarp,
-			weft: initWeft,
-			warpColors: new Array(initWarp).fill(0),
-			weftColors: new Array(initWeft).fill(0),
-			tieup: new Array(initShafts).fill(0).map(() => new Array(initTreadles).fill(0)),
-			threading: new Array(initWarp).fill(0),
-			treadling: new Array(initWeft).fill(0).map(() => new Array(initTreadles).fill(0)),
-			drawdownColors: new Array(initWarp).fill(0).map(() => new Array(initWeft).fill(0))
+			cursorColor: 1,
+			colorKey: ["#ffffff", "#000000"],
+			warpColors: new Array(this.props.warp).fill(0),
+			weftColors: new Array(this.props.weft).fill(0),
+			tieup: new Array(this.props.shafts).fill(0).map(() => new Array(this.props.treadles).fill(0)),
+			threading: new Array(this.props.warp).fill(0),
+			treadling: new Array(this.props.weft).fill(0).map(() => new Array(this.props.treadles).fill(0)),
+			drawdownColors: new Array(this.props.weft).fill(0).map(() => new Array(this.props.warp).fill(0))
 		}
 		this.getShafts = this.getShafts.bind(this);
 		this.updateColumn = this.updateColumn.bind(this);
@@ -44,7 +37,6 @@ class Draft extends React.PureComponent {
 				treadles.push(j);
 			}
 		}
-		console.log("treadles:", treadles);
 		if (treadles.length === 0) return [];
 		let shafts = getColumnFromTable(this.state.tieup, treadles[0]);
 		for (let j = 1, len = treadles.length; j < len; j++) {
@@ -53,7 +45,6 @@ class Draft extends React.PureComponent {
 				shafts[k] = shafts[k] || addedShaft[k];
 			}
 		}
-		console.log("shafts:", shafts);
 		return shafts;
 	}
 
@@ -98,7 +89,7 @@ class Draft extends React.PureComponent {
 
 	handleClickWarpColor(i, j) {
 		this.setState(state => {
-			const newWarpColors = updateArray(state.warpColors, j, a => this.props.cursorColor);
+			const newWarpColors = updateArray(state.warpColors, j, a => this.state.cursorColor);
 			return {warpColors: newWarpColors};
 		}, () => {
 			this.updateColumn(j);
@@ -148,7 +139,7 @@ class Draft extends React.PureComponent {
 
 	handleClickWeftColor(i, j) {
 		this.setState(state => {
-			const newWeftColors = updateArray(state.weftColors, i, a => this.props.cursorColor);
+			const newWeftColors = updateArray(state.weftColors, i, a => this.state.cursorColor);
 			return {weftColors: newWeftColors};
 		}, () => {
 			this.updateRow(i);
@@ -157,21 +148,27 @@ class Draft extends React.PureComponent {
 
 	handleColorChange(e) {
 		let newColor = e.target.value;
-		let i = this.props.colorKey.indexOf(newColor);
+		let i = this.state.colorKey.indexOf(newColor);
 		if (i > -1) {
-			this.props.onUpdateCursorColor(i);
+			this.setState({cursorColor: i});
 		}
 		else {
-			this.props.onUpdateCursorColor(this.props.colorKey.length);
-			this.props.onUpdateColorKey(newColor);
+			this.setState(state => {
+				const newColorIndex = state.colorKey.length;
+				const newColorKey = updateArray(state.colorKey, newColorIndex, a => newColor);
+				return {
+					cursorColor: newColorIndex,
+					colorKey: newColorKey
+				};
+			});
 		}
 	}
 
 	render() {
-		const shafts = this.state.shafts;
-		const treadles = this.state.treadles;
-		const warp = this.state.warp;
-		const weft = this.state.weft;
+		const shafts = this.props.shafts;
+		const treadles = this.props.treadles;
+		const warp = this.props.warp;
+		const weft = this.props.weft;
 		return (
 			<div id="topTable">
 				<table cellPadding="5"><tbody>
@@ -179,7 +176,7 @@ class Draft extends React.PureComponent {
 						<td></td>
 						<td><form
 							id="colorPicker"
-							style={{backgroundColor: this.props.colorKey[this.props.cursorColor]}}>
+							style={{backgroundColor: this.state.colorKey[this.state.cursorColor]}}>
 								<input
 									type="color"
 									onChange={this.handleColorChange}
@@ -190,8 +187,8 @@ class Draft extends React.PureComponent {
 							numX={warp}
 							numY="1"
 							cellColors={this.state.warpColors}
-							cursorColor={this.props.cursorColor}
-							colorKey={this.props.colorKey}
+							cursorColor={this.state.cursorColor}
+							colorKey={this.state.colorKey}
 						/></td>
 					</tr>
 					<tr>
@@ -215,8 +212,8 @@ class Draft extends React.PureComponent {
 							numX="1"
 							numY={weft}
 							cellColors={this.state.weftColors}
-							cursorColor={this.props.cursorColor}
-							colorKey={this.props.colorKey}
+							cursorColor={this.state.cursorColor}
+							colorKey={this.state.colorKey}
 						/></td>
 						<td><Treadling
 							onClick={this.handleClickTreadling}
@@ -227,8 +224,8 @@ class Draft extends React.PureComponent {
 						<td><Drawdown
 							numX={warp}
 							numY={weft}
-							cursorColor={this.props.cursorColor}
-							colorKey={this.props.colorKey}
+							cursorColor={this.state.cursorColor}
+							colorKey={this.state.colorKey}
 							drawdownColors={this.state.drawdownColors}
 						/></td>
 					</tr>
@@ -238,14 +235,30 @@ class Draft extends React.PureComponent {
 	}
 }
 
-const mapStateToProps = state => ({
-	cursorColor: state.cursorColor,
-	colorKey: state.colorKey
-});
+export default class Draft extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			warp: 50,
+			weft: 50,
+			shafts: 8,
+			treadles: 10
+		}
+	}
 
-const mapDispatchToProps = {
-	onUpdateCursorColor: updateCursorColor,
-	onUpdateColorKey: updateColorKey
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(Draft);
+	render() {
+		const warp = this.state.warp;
+		const weft = this.state.weft;
+		const shafts = this.state.shafts;
+		const treadles = this.state.treadles;
+		return (
+			<DraftChild
+				key={quickHash("" + warp + weft + shafts + treadles).toString()}
+				warp={warp}
+				weft={weft}
+				shafts={shafts}
+				treadles={treadles}
+			/>
+		);
+	}
+}

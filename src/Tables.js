@@ -95,7 +95,6 @@ class DraftTable extends React.Component {
 	}
 
 	handleMouseDown(i, j) {
-		console.log("tieup", this.props.cellColors);
 		this.setState(state => {
 			return ({
 				mouseDown: true,
@@ -118,19 +117,6 @@ class DraftTable extends React.Component {
 		if (this.props.cellColors[i][j] !== this.clickedCellColor(i, j)) {
 			const newColor = this.clickedCellColor(i, j);
 			this.props.onClick && this.props.onClick(i, j, newColor);
-			/*
-			this.setState(state => {
-				let newCellColors = [];
-				for (let k = 0; k < state.cellColors.length; k++) {
-					newCellColors[k] = state.cellColors[k].slice();
-				}
-
-				newCellColors[i][j] = this.clickedCellColor(i, j);
-				return {cellColors: newCellColors};
-			}, () => {
-				this.props.onClick && this.props.onClick(i, j);
-			});
-			*/
 		}
 	}
 
@@ -179,7 +165,6 @@ export class WarpColoring extends DraftTable {
 		super(props);
 		this.className = "leftDraftTable";
 		this.useColors = true;
-		console.log("coloring", this.props.cellColors);
 	}
 
 	clickedCellColor(i, j) {
@@ -221,7 +206,6 @@ export class WeftColoring extends DraftTable {
 	constructor(props) {
 		super(props);
 		this.useColors = true;
-		console.log("coloring", this.props.cellColors);
 	}
 
 	clickedCellColor(i, j) {
@@ -293,7 +277,6 @@ export class Threading extends DraftTable {
 	}
 
 	handleClick(i, j) {
-//		console.log("clicked", i, j);
 		if (i !== this.props.threading[j]) {
 			this.props.onClick(i, j);
 		}

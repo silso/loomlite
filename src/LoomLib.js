@@ -33,8 +33,7 @@ export function updateArray(a, i, fn) {
  * @param  {Object} target this is the html node within which selection is disabled
  * @return {type}        null
  */
-export function disableSelection(target){
-
+export function disableSelection(target) {
 	if (typeof target.onselectstart!="undefined") //IE route
 		target.onselectstart=function(){return false}
 
@@ -45,4 +44,18 @@ export function disableSelection(target){
 		target.onmousedown=function(){return false}
 
 	target.style.cursor = "default"
+}
+
+/**
+ * exportgetColumnFromTable() Returns by value a column from a table
+ *
+ * @param {Array} a - input array
+ * @param {int} i - index of column
+ *
+ * @return {Array}
+ */
+export function getColumnFromTable(a, i) {
+	return a.map(row => {
+		return row[i];
+	});
 }

@@ -1,5 +1,6 @@
 import React from "react";
 import {updateArray} from "./LoomLib.js";
+import {ColorContext} from "./Draft.js";
 
 /**
  * DraftCell - base component of all Draft components. This is displayed as one
@@ -9,9 +10,6 @@ import {updateArray} from "./LoomLib.js";
 class DraftCell extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = {
-			clicked: false
-		}
 		this.handleMouseEnter = this.handleMouseEnter.bind(this);
 		this.handleClick = this.handleClick.bind(this);
 		this.handleMouseDown = this.handleMouseDown.bind(this);
@@ -35,8 +33,14 @@ class DraftCell extends React.Component {
 		let color = "white";
 		let text = "";
 		if (this.props.type === 0) {
-			if (this.props.display === 1) {
-				color = "black";
+			if (this.props.display === 0) {
+				color = "#ffffff";
+			}
+			else if (this.props.display === 1) {
+				color = "#000000";
+			}
+			else {
+				color = this.props.colorKey[this.props.display];
 			}
 		}
 		else {
@@ -50,6 +54,18 @@ class DraftCell extends React.Component {
 				style={{backgroundColor: color}}
 			>{text}</td>
 		)
+	}
+}
+
+class DrawdownCell extends React.Component {
+	render() {
+		let color = this.props.colorKey[this.props.display];
+		return (
+			<td
+				className={this.props.className}
+				style={{backgroundColor: color}}
+			></td>
+		);
 	}
 }
 
@@ -101,15 +117,20 @@ class DraftTable extends React.Component {
 
 	handleClick(i, j) {
 //		console.log("clicked", i, j);
-		this.setState(state => {
-			let newCellColors = [];
-			for (let k = 0; k < state.cellColors.length; k++) {
-				newCellColors[k] = state.cellColors[k].slice();
-			}
+		if (this.state.cellColors[i][j] !== this.clickedCellColor(i, j)) {
+			this.setState(state => {
+				let newCellColors = [];
+				for (let k = 0; k < state.cellColors.length; k++) {
+					newCellColors[k] = state.cellColors[k].slice();
+				}
 
-			newCellColors[i][j] = this.clickedCellColor(i, j);
-			return {cellColors: newCellColors};
-		});
+				newCellColors[i][j] = this.clickedCellColor(i, j);
+				return {cellColors: newCellColors};
+			}, () => {
+				console.log(this.props.onClick);
+				this.props.onClick && this.props.onClick(i, j);
+			});
+		}
 	}
 
 	render() {
@@ -119,13 +140,14 @@ class DraftTable extends React.Component {
 			for (let j = 0; j < this.props.numX; j++) {
 				row[j] = <DraftCell
 					key={`${i},${j}`}
-					pos={{x: j, y: i}}
+					className="draftCell"
 					onMouseDown={this.handleMouseDown}
 					onClick={this.handleClick}
 					mouseDown={this.state.mouseDown}
+					pos={{x: j, y: i}}
 					display={this.state.cellColors[i][j]}
-					className="draftCell"
 					type={this.type}
+					colorKey={this.useColors && this.props.colorKey}
 				/>;
 			}
 			if (this.flipVertically) {
@@ -155,6 +177,11 @@ export class Coloring extends DraftTable {
 	constructor(props) {
 		super(props);
 		this.className = "leftDraftTable";
+		this.useColors = true;
+	}
+
+	clickedCellColor(i, j) {
+		return this.props.cursorColor;
 	}
 }
 
@@ -181,10 +208,8 @@ export class Threading extends DraftTable {
 		this.className = "leftDraftTable";
 		this.flipVertically = true;
 		this.state = {
-			shaftNums: [],
 			mouseDown: false
 		}
-		this.state.shaftNums = new Array(this.props.numX).fill(0);
 	}
 
 	handleMouseDown(i, j) {
@@ -199,12 +224,9 @@ export class Threading extends DraftTable {
 
 	handleClick(i, j) {
 //		console.log("clicked", i, j);
-		this.setState(state => {
-			let newShaftNums = state.shaftNums.slice();
-
-			newShaftNums[j] = i;
-			return {shaftNums: newShaftNums};
-		});
+		if (i !== this.props.threading[j]) {
+			this.props.onClick(i, j);
+		}
 	}
 
 	render() {
@@ -213,7 +235,7 @@ export class Threading extends DraftTable {
 			let row = new Array(this.props.numX);
 			for (let j = 0; j < this.props.numX; j++) {
 				let display = "";
-				if (this.state.shaftNums[j] === i) {
+				if (this.props.threading[j] === i) {
 					display = i + 1;
 				}
 				row[j] = <DraftCell
@@ -258,9 +280,31 @@ export class Treadling extends DraftTable {
  * Drawdown - shows the pattern. bottom left table
  * @extends DraftTable
  */
-export class Drawdown extends DraftTable {
+export class Drawdown extends React.Component {
 	constructor(props) {
 		super(props);
-		this.className = "leftDraftTable";
+	}
+
+	render() {
+		let table = new Array(this.props.numY);
+		for (let i = 0; i < this.props.numY; i++) {
+			let row = new Array(this.props.numX);
+			for (let j = 0; j < this.props.numX; j++) {
+				row[j] = <DrawdownCell
+					key={`${i},${j}`}
+					display={this.props.drawdownColors[i][j]}
+					colorKey={this.props.colorKey}
+					className="draftCell"
+				/>;
+			}
+			table[i] = <tr key={`${i}`}>{row}</tr>;
+		}
+		return (
+			<table
+				className="leftDraftTable"
+				cellPadding="0"
+				cellSpacing="0"
+			><tbody>{table}</tbody></table>
+		);
 	}
 }

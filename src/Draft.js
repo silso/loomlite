@@ -1,5 +1,5 @@
 import React from "react";
-import {Coloring, Tieup, Threading, Treadling, Drawdown} from "./Tables.js";
+import {WarpColoring, WeftColoring, Tieup, Threading, Treadling, Drawdown} from "./Tables.js";
 import {updateArray, disableSelection, getColumnFromTable} from "./LoomLib.js";
 
 import {connect} from "react-redux";
@@ -17,15 +17,18 @@ class Draft extends React.PureComponent {
 			weft: initWeft,
 			warpColors: new Array(initWarp).fill(0),
 			weftColors: new Array(initWeft).fill(0),
-			tieup: new Array(initShafts).fill(0).map(() => new Array(initTreadles).fill(false)),
+			tieup: new Array(initShafts).fill(0).map(() => new Array(initTreadles).fill(0)),
 			threading: new Array(initWarp).fill(0),
-			treadling: new Array(initWeft).fill(0).map(() => new Array(initTreadles).fill(false)),
+			treadling: new Array(initWeft).fill(0).map(() => new Array(initTreadles).fill(0)),
 			drawdownColors: new Array(initWarp).fill(0).map(() => new Array(initWeft).fill(0))
 		}
+		this.getShafts = this.getShafts.bind(this);
 		this.updateColumn = this.updateColumn.bind(this);
 		this.updateRow = this.updateRow.bind(this);
 		this.handleClickWarpColor = this.handleClickWarpColor.bind(this);
 		this.handleClickThreading = this.handleClickThreading.bind(this);
+		this.handleClickTieup = this.handleClickTieup.bind(this);
+		this.handleClickTreadling = this.handleClickTreadling.bind(this);
 		this.handleClickWeftColor = this.handleClickWeftColor.bind(this);
 		this.handleColorChange = this.handleColorChange.bind(this);
 	}
@@ -34,11 +37,31 @@ class Draft extends React.PureComponent {
 		disableSelection(document.getElementById("topTable"));
 	}
 
+	getShafts(i) {
+		let treadles = [];
+		for (let j = 0, len = this.state.treadling[i].length; j < len; j++) {
+			if (this.state.treadling[i][j] === 1) {
+				treadles.push(j);
+			}
+		}
+		console.log("treadles:", treadles);
+		if (treadles.length === 0) return [];
+		let shafts = getColumnFromTable(this.state.tieup, treadles[0]);
+		for (let j = 1, len = treadles.length; j < len; j++) {
+			let addedShaft = getColumnFromTable(this.state.tieup, treadles[j]);
+			for (let k = 0, len2 = shafts.length; k < len2; k++) {
+				shafts[k] = shafts[k] || addedShaft[k];
+			}
+		}
+		console.log("shafts:", shafts);
+		return shafts;
+	}
+
 	updateColumn(j) {
 		this.setState(state => {
 			const newDrawdownColors = state.drawdownColors.map((row, rowIndex) => {
 				let rowCopy = row.slice();
-				const shafts = getColumnFromTable(this.state.tieup, 0);
+				const shafts = this.getShafts(rowIndex);
 				if (shafts[this.state.threading[j]]) {
 					rowCopy[j] = this.state.warpColors[j];
 				}
@@ -56,7 +79,7 @@ class Draft extends React.PureComponent {
 			const newDrawdownColors = state.drawdownColors.map((row, rowIndex) => {
 				if (rowIndex === i) {
 					let rowCopy = row.slice();
-					const shafts = getColumnFromTable(this.state.tieup, 0);
+					const shafts = this.getShafts(i);
 					for (let j = 0, len = rowCopy.length; j < len; j++) {
 						if (!shafts[this.state.threading[j]]) {
 							rowCopy[j] = this.state.weftColors[i];
@@ -88,6 +111,38 @@ class Draft extends React.PureComponent {
 			return {threading: newThreading};
 		}, () => {
 			this.updateColumn(j);
+		});
+	}
+
+	handleClickTieup(i, j, newColor) {
+		this.setState(state => {
+			const newTieup = state.tieup.map((row, rowIndex) => {
+				let rowCopy = row.slice();
+				if (i === rowIndex) {
+					rowCopy[j] = newColor;
+				}
+				return rowCopy;
+			});
+			return {tieup: newTieup};
+		}, () => {
+			for (let k = 0, len = this.state.weft; k < len; k++) {
+				this.updateRow(k);
+			}
+		});
+	}
+
+	handleClickTreadling(i, j, newColor) {
+		this.setState(state => {
+			const newTreadling = state.treadling.map((row, rowIndex) => {
+				let rowCopy = row.slice();
+				if (i === rowIndex) {
+					rowCopy[j] = newColor;
+				}
+				return rowCopy;
+			});
+			return {treadling: newTreadling};
+		}, () => {
+			this.updateRow(i);
 		});
 	}
 
@@ -130,10 +185,11 @@ class Draft extends React.PureComponent {
 									onChange={this.handleColorChange}
 								/>
 						</form></td>
-						<td><Coloring 
+						<td><WarpColoring 
 							onClick={this.handleClickWarpColor}
 							numX={warp}
 							numY="1"
+							cellColors={this.state.warpColors}
 							cursorColor={this.props.cursorColor}
 							colorKey={this.props.colorKey}
 						/></td>
@@ -141,8 +197,10 @@ class Draft extends React.PureComponent {
 					<tr>
 						<td></td>
 						<td><Tieup 
+							onClick={this.handleClickTieup}
 							numX={treadles}
 							numY={shafts}
+							cellColors={this.state.tieup}
 						/></td>
 						<td><Threading 
 							onClick={this.handleClickThreading}
@@ -152,14 +210,20 @@ class Draft extends React.PureComponent {
 						/></td>
 					</tr>
 					<tr>
-						<td><Coloring
+						<td><WeftColoring
 							onClick={this.handleClickWeftColor}
 							numX="1"
 							numY={weft}
+							cellColors={this.state.weftColors}
 							cursorColor={this.props.cursorColor}
 							colorKey={this.props.colorKey}
 						/></td>
-						<td><Treadling numX={treadles} numY={weft}/></td>
+						<td><Treadling
+							onClick={this.handleClickTreadling}
+							numX={treadles}
+							numY={weft}
+							cellColors={this.state.treadling}
+						/></td>
 						<td><Drawdown
 							numX={warp}
 							numY={weft}

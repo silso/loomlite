@@ -1,3 +1,5 @@
+@import "DraftSettings";
+
 $sans-serif: Arial, sans-serif;
 
 body {
@@ -9,6 +11,10 @@ body {
 	direction: rtl;
 	overflow: scroll;
 	height: 100%;
+
+	* * {
+		direction: ltr;
+	}
 
 	td {
 		text-align: center;
@@ -33,7 +39,7 @@ body {
 }
 
 .draftTable {
-	direction: ltr;
+//	direction: ltr;
 }
 
 .leftDraftTable {

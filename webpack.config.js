@@ -21,8 +21,21 @@ module.exports = {
         use: ["babel-loader"]
       },
 			{
-				test: /\.(s*)css$/,
+				test: /\.scss$/,
+				exclude: /node_modules/,
 				use: ["style-loader", "css-loader", "sass-loader"]
+			},
+			{
+				test: /\.(png|jpg|gif)$/i,
+				exclude: /node_modules/,
+				use: [
+					{
+						loader: "url-loader",
+						options: {
+							limit: 8192
+						}
+					}
+				]
 			}
     ]
   }

@@ -1,5 +1,6 @@
 import React from "react";
 import {WarpColoring, WeftColoring, Tieup, Threading, Treadling, Drawdown} from "./Tables.js";
+import {DraftSettings, DraftSettingsButton} from "./DraftSettings.js";
 import {updateArray, disableSelection, getColumnFromTable, quickHash} from "./LoomLib.js";
 
 //forgive my absolute abuse of JSDoc
@@ -35,6 +36,8 @@ class DraftChild extends React.PureComponent {
 		this.handleClickTreadling = this.handleClickTreadling.bind(this);
 		this.handleClickWeftColor = this.handleClickWeftColor.bind(this);
 		this.handleColorChange = this.handleColorChange.bind(this);
+		this.handleOpenDraftSettings = this.handleOpenDraftSettings.bind(this);
+		this.handleCloseDraftSettings = this.handleCloseDraftSettings.bind(this);
 	}
 
 	//disables text selection otherwise messes up dragging in some browsers
@@ -261,7 +264,19 @@ class DraftChild extends React.PureComponent {
 		}
 	}
 
+	handleOpenDraftSettings() {
+		this.setState({draftSettingsOpen: true});
+	}
+
+	handleCloseDraftSettings() {
+		this.setState({draftSettingsOpen: false});
+	}
+
 	render() {
+		let draftSettings;
+		if (this.state.draftSettingsOpen) {
+			draftSettings = <DraftSettings onClose={this.handleCloseDraftSettings} settings={this.props.settings}/>;
+		}
 		const shafts = this.props.shafts;
 		const treadles = this.props.treadles;
 		const warp = this.props.warp;
@@ -269,9 +284,10 @@ class DraftChild extends React.PureComponent {
 		//topTable uses direction:rtl, so the cell order in each row is backwards (first <td> is on the right)
 		return (
 			<div id="topTable">
+				{draftSettings}
 				<table cellPadding="5"><tbody>
 					<tr>
-						<td></td>
+						<td><DraftSettingsButton onClick={this.handleOpenDraftSettings}/></td>
 						<td><form
 							id="colorPicker"
 							style={{backgroundColor: this.state.colorKey[this.state.cursorColor]}}>
@@ -343,6 +359,12 @@ export default class Draft extends React.Component {
 			shafts: 8,
 			treadles: 10
 		}
+		this.handleSettingsUpdate.bind(this);
+	}
+
+	handleSettingsUpdate(newSettings) {
+		//with error checking
+		this.setState(newSettings);
 	}
 
 	render() {
@@ -358,6 +380,8 @@ export default class Draft extends React.Component {
 				weft={weft}
 				shafts={shafts}
 				treadles={treadles}
+				settings={this.state}
+				onSettingsUpdate={this.handleSettingsUpdate}
 			/>
 		);
 	}

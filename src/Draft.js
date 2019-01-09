@@ -24,7 +24,9 @@ class DraftChild extends React.PureComponent {
 			//2d array of ints (0 or 1) representing treadling pattern. init with all 0 (no treadle presses).
 			treadling: new Array(this.props.weft).fill(0).map(() => new Array(this.props.treadles).fill(0)),
 			//2d array of ints representing the current pattern that is woven. init with all white.
-			drawdownColors: new Array(this.props.weft).fill(0).map(() => new Array(this.props.warp).fill(0))
+			drawdownColors: new Array(this.props.weft).fill(0).map(() => new Array(this.props.warp).fill(0)),
+			//boolean of whether draft settings are open
+			draftSettingsOpen: false
 		}
 		//bind all functions that need access to this
 		this.getShafts = this.getShafts.bind(this);
@@ -268,14 +270,19 @@ class DraftChild extends React.PureComponent {
 		this.setState({draftSettingsOpen: true});
 	}
 
-	handleCloseDraftSettings() {
+	handleCloseDraftSettings(newSettings) {
 		this.setState({draftSettingsOpen: false});
+		this.props.onSettingsUpdate(newSettings);
 	}
 
 	render() {
 		let draftSettings;
 		if (this.state.draftSettingsOpen) {
-			draftSettings = <DraftSettings onClose={this.handleCloseDraftSettings} settings={this.props.settings}/>;
+			draftSettings = <DraftSettings
+				onClose={this.handleCloseDraftSettings}
+				settings={this.props.settings}
+				onSettingsUpdate={this.props.onSettingsUpdate}
+			/>;
 		}
 		const shafts = this.props.shafts;
 		const treadles = this.props.treadles;
@@ -299,7 +306,7 @@ class DraftChild extends React.PureComponent {
 						<td><WarpColoring 
 							onClick={this.handleClickWarpColor}
 							numX={warp}
-							numY="1"
+							numY={1}
 							cellColors={this.state.warpColors}
 							cursorColor={this.state.cursorColor}
 							colorKey={this.state.colorKey}
@@ -323,7 +330,7 @@ class DraftChild extends React.PureComponent {
 					<tr>
 						<td><WeftColoring
 							onClick={this.handleClickWeftColor}
-							numX="1"
+							numX={1}
 							numY={weft}
 							cellColors={this.state.weftColors}
 							cursorColor={this.state.cursorColor}
@@ -359,12 +366,16 @@ export default class Draft extends React.Component {
 			shafts: 8,
 			treadles: 10
 		}
-		this.handleSettingsUpdate.bind(this);
+		this.handleSettingsUpdate = this.handleSettingsUpdate.bind(this);
 	}
 
 	handleSettingsUpdate(newSettings) {
 		//with error checking
 		this.setState(newSettings);
+	}
+
+	handleBlah() {
+		this.setState({shafts:4, treadles:4});
 	}
 
 	render() {

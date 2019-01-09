@@ -180,7 +180,7 @@ export class WarpColoring extends DraftTable {
 				onMouseDown={this.handleMouseDown}
 				onClick={this.handleClick}
 				mouseDown={this.state.mouseDown}
-				pos={{x: i, y: 1}}
+				pos={{x: i, y: 0}}
 				display={this.props.cellColors[i]}
 				type={this.type}
 				colorKey={this.useColors && this.props.colorKey}
@@ -221,7 +221,7 @@ export class WeftColoring extends DraftTable {
 				onMouseDown={this.handleMouseDown}
 				onClick={this.handleClick}
 				mouseDown={this.state.mouseDown}
-				pos={{x: 1, y: i}}
+				pos={{x: 0, y: i}}
 				display={this.props.cellColors[i]}
 				type={this.type}
 				colorKey={this.useColors && this.props.colorKey}
